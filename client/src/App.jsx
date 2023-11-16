@@ -1,4 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+
 import Home from './pages/Home';
 import About from './pages/About';
 import Profile from './pages/Profile';
@@ -17,6 +19,7 @@ const App = () => {
                 <Route path='/profile' element={<Profile />} />
                 <Route path='/sign-up' element={<SignUp />} />
             </Routes>
+            <Toaster />
         </BrowserRouter>
     );
 };
