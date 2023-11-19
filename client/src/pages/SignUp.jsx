@@ -88,7 +88,14 @@ const SignUp = () => {
                             id='email'
                             fullWidth
                             type='email'
-                            helperText='Please enter a valid email address'
+                            helperText={
+                                <Typography
+                                    style={{ color: 'red', fontSize: '.75rem' }}
+                                    textAlign='center'
+                                >
+                                    Please enter a valid email address
+                                </Typography>
+                            }
                             margin='normal'
                             onChange={handleChange}
                         />
