@@ -39,10 +39,18 @@ export const signin = async (req, res, next) => {
         const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
 
         const { password: hashedPassword, ...user } = validUser;
-        const expires = new Date(Date.now() + 3600000);
-        res.cookie('access_token', token, { httpOnly: true }, expires)
+        const expires = new Date();
+        expires.setUTCHours(expires.getUTCHours() + 1);
+        res.cookie('access_token', token, {
+            httpOnly: true,
+            expires: expires,
+        })
             .status(200)
-            .json(user);
+            .json({
+                message: 'User Successfully logged In',
+                data: user,
+                date: expires,
+            });
     } catch (error) {
         next(error);
     }

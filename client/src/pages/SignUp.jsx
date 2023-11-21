@@ -1,30 +1,11 @@
-import { Typography, TextField, Button, Grid, Paper } from '@mui/material';
-import { styled } from '@mui/system';
+import { Typography, TextField, Button, Grid } from '@mui/material';
 import toast from 'react-hot-toast';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
-
-const StyledGrid = styled(Grid)({
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 'calc(100vh - 64px)',
-});
-
-const StyledPaper = styled(Paper)({
-    padding: '16px',
-    maxWidth: 400,
-    width: '100%',
-});
-
-const StyledLink = styled(Link)({
-    textDecoration: 'none',
-    color: 'blue',
-    '&:hover': {
-        textDecoration: 'underline',
-    },
-});
+import StyledGrid from '../common/StyledGrid';
+import StyledPaper from '../common/StyledPaper';
+import StyledLink from '../common/StyledLink';
+import { useNavigate } from 'react-router-dom';
 
 const SignUp = () => {
     const [formData, setFormData] = useState({
@@ -33,6 +14,7 @@ const SignUp = () => {
         password: '',
     });
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         setFormData({
@@ -53,6 +35,7 @@ const SignUp = () => {
             console.log(response);
             toast.success(response?.data?.message);
             setLoading(false);
+            navigate('/sign-in');
         } catch (error) {
             debugger;
             const { message } = error?.response?.data;
@@ -126,7 +109,7 @@ const SignUp = () => {
                             style={{ marginTop: '16px' }}
                         >
                             Already have an account?
-                            <StyledLink to='/sign-in'>Log in here</StyledLink>
+                            <StyledLink to='/sign-in'> Log in here</StyledLink>
                         </Typography>
                     </form>
                 </StyledPaper>
