@@ -38,9 +38,7 @@ const Login = () => {
             const response = await axios.post(
                 'http://localhost:5000/api/auth/signin',
                 formData,
-                {
-                    withCredentials: true,
-                }
+                { withCredentials: true }
             );
             toast.success(response?.data?.message);
             dispatch(signInSuccess(response?.data?.data));
