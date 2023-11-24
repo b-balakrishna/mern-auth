@@ -1,26 +1,36 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import React, { Suspense, useEffect, useState } from 'react';
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-
-import Home from './pages/Home';
-import About from './pages/About';
-import Profile from './pages/Profile';
-import SignUp from './pages/SignUp';
-import Login from './pages/Login';
 import Navbar from './pages/Navbar';
+import { useSelector } from 'react-redux';
+import routes from './routes/routes';
+import Loader from './common/Loader';
+import RouteComponent from './routes/RouteComponent';
 
 const App = () => {
+    const { currentUser } = useSelector((state) => state.user);
     return (
         <BrowserRouter>
-            <Navbar />
-            <Routes>
-                <Route path='/' element={<Home />} />
-                <Route path='/sign-in' element={<Login />} />
-                <Route path='/about' element={<About />} />
-                <Route path='/profile' element={<Profile />} />
-                <Route path='/sign-up' element={<SignUp />} />
-            </Routes>
+            <Navbar currentUser={currentUser} />
+            <Suspense fallback={<Loader />}>
+                <Routes>
+                    {routes.map((route, index) => (
+                        <Route
+                            key={index}
+                            path={route.path}
+                            element={
+                                <RouteComponent
+                                    route={route}
+                                    currentUser={currentUser}
+                                />
+                            }
+                        />
+                    ))}
+                </Routes>
+            </Suspense>
             <Toaster />
         </BrowserRouter>
     );
 };
+
 export default App;

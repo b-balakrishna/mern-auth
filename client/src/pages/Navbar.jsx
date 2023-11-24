@@ -4,12 +4,13 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { Link } from 'react-router-dom';
+import { Avatar } from '@mui/material';
 
 const linkStyle = {
-    textDecoration: 'none', // Remove underline
-    color: 'inherit', // Inherit the color from the parent element (Button in this case)
+    textDecoration: 'none',
+    color: 'inherit',
 };
-export default function Navbar() {
+export default function Navbar({ currentUser }) {
     return (
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position='static'>
@@ -34,9 +35,18 @@ export default function Navbar() {
                         </Link>
                     </Button>
                     <Button color='inherit'>
-                        <Link to='/sign-in' style={linkStyle}>
-                            Sign In
-                        </Link>
+                        {currentUser ? (
+                            <Link to='/profile'>
+                                <Avatar
+                                    src={currentUser?.profilePicture}
+                                    alt={currentUser?.username}
+                                />
+                            </Link>
+                        ) : (
+                            <Link to='/sign-in' style={linkStyle}>
+                                Sign In
+                            </Link>
+                        )}
                     </Button>
                 </Toolbar>
             </AppBar>
