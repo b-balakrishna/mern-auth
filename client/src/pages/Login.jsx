@@ -12,6 +12,7 @@ import {
     signInSuccess,
 } from '../redux/user/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import OAuth from '../common/OAuth';
 
 const Login = () => {
     const [formData, setFormData] = useState({
@@ -102,7 +103,7 @@ const Login = () => {
                         >
                             {loading ? 'Loading...' : 'Sign In'}
                         </Button>
-
+                        <OAuth />
                         <Typography
                             variant='body2'
                             align='center'

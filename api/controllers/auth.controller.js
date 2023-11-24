@@ -41,10 +41,11 @@ export const signin = async (req, res, next) => {
         const { password: hashedPassword, ...user } = validUser;
         const expires = new Date();
         expires.setUTCHours(expires.getUTCHours() + 1);
-        res.cookie('access_token', token, {
-            httpOnly: true,
-            expires: expires,
-        })
+        return res
+            .cookie('access_token', token, {
+                httpOnly: true,
+                expires: expires,
+            })
             .status(200)
             .json({
                 message: 'User Successfully logged In',
@@ -53,5 +54,63 @@ export const signin = async (req, res, next) => {
             });
     } catch (error) {
         next(error);
+    }
+};
+
+export const google = async (req, res, next) => {
+    const { email, name, photoUrl, provider } = req.body;
+    try {
+        const user = await User.findOne({ email }).lean();
+        if (user) {
+            const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+            const { password, ...userData } = user;
+            const expires = new Date();
+            expires.setUTCHours(expires.getUTCHours() + 1);
+            return res
+                .cookie('access_token', token, {
+                    httpOnly: true,
+                    expires: expires,
+                })
+                .status(200)
+                .json({
+                    message: 'User Successfully logged In',
+                    data: userData,
+                    date: expires,
+                });
+        }
+        const generatedPassword =
+            Math.random().toString(36).slice(-8) +
+            Math.random().toString(36).slice(-8);
+        const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
+        const username =
+            name.split(' ').join('').toLowerCase() +
+            Math.floor(Math.random() * 10000).toString();
+        const newUserData = {
+            username,
+            email,
+            profilePicture: photoUrl,
+            provider,
+            password: hashedPassword,
+        };
+        const userObj = new User(newUserData);
+        const newUser = await userObj.save();
+        const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+        const { password, ...userData } = newUser._doc;
+        const expires = new Date();
+        expires.setUTCHours(expires.getUTCHours() + 1);
+        return res
+            .cookie('access_token', token, {
+                httpOnly: true,
+                expires: expires,
+            })
+            .status(200)
+            .json({
+                message: 'User Successfully Signed Up',
+                data: userData,
+                date: expires,
+            });
+    } catch (error) {
+        console.log(error);
+        res.json({ message: 'ERROR', data: error });
     }
 };

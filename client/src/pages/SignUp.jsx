@@ -6,6 +6,7 @@ import StyledGrid from '../common/StyledGrid';
 import StyledPaper from '../common/StyledPaper';
 import StyledLink from '../common/StyledLink';
 import { useNavigate } from 'react-router-dom';
+import OAuth from '../common/OAuth';
 
 const SignUp = () => {
     const [formData, setFormData] = useState({
@@ -102,7 +103,7 @@ const SignUp = () => {
                         >
                             {loading ? 'Loading...' : 'Sign Up'}
                         </Button>
-
+                        <OAuth />
                         <Typography
                             variant='body2'
                             align='center'
