@@ -1,34 +1,33 @@
 import { Typography, TextField, Button, Grid } from '@mui/material';
 import toast from 'react-hot-toast';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import StyledGrid from '../common/StyledGrid';
 import StyledPaper from '../common/StyledPaper';
 import StyledLink from '../common/StyledLink';
 import { useNavigate } from 'react-router-dom';
 import OAuth from '../common/OAuth';
+import { useForm } from 'react-hook-form';
 
 const SignUp = () => {
-    const [formData, setFormData] = useState({
-        username: '',
-        email: '',
-        password: '',
+    const form = useForm({
+        defaultValues: {
+            username: '',
+            email: '',
+            password: '',
+        },
+        mode: 'onTouched',
     });
+    const { register, handleSubmit, formState, control } = form;
+    const { errors } = formState;
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.id]: e.target.value,
-        });
-    };
-
-    const onSubmit = async (e) => {
+    const onSubmit = async (formData) => {
         try {
+            debugger;
             setLoading(true);
             e.preventDefault();
-            console.log(formData);
             const response = await axios.post(
                 'http://localhost:5000/api/auth/signup',
                 formData
@@ -38,7 +37,6 @@ const SignUp = () => {
             setLoading(false);
             navigate('/sign-in');
         } catch (error) {
-            debugger;
             const { message } = error?.response?.data;
             setLoading(false);
             toast.error(message);
@@ -54,7 +52,7 @@ const SignUp = () => {
         >
             <Grid item xs={12} sm={8} md={6} lg={4}>
                 <StyledPaper elevation={3}>
-                    <form onSubmit={onSubmit}>
+                    <form onSubmit={handleSubmit(onSubmit)} noValidate>
                         <Typography variant='h5' gutterBottom align='center'>
                             Sign Up
                         </Typography>
@@ -64,7 +62,11 @@ const SignUp = () => {
                             id='username'
                             fullWidth
                             margin='normal'
-                            onChange={handleChange}
+                            {...register('username', {
+                                required: 'User Name is Required',
+                            })}
+                            error={!!errors.username}
+                            helperText={errors.username?.message}
                         />
 
                         <TextField
@@ -72,16 +74,17 @@ const SignUp = () => {
                             id='email'
                             fullWidth
                             type='email'
-                            helperText={
-                                <Typography
-                                    style={{ color: 'red', fontSize: '.75rem' }}
-                                    textAlign='center'
-                                >
-                                    Please enter a valid email address
-                                </Typography>
-                            }
                             margin='normal'
-                            onChange={handleChange}
+                            {...register('email', {
+                                required: 'Email is required',
+                                pattern: {
+                                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                                    message:
+                                        'Please enter a valid email address',
+                                },
+                            })}
+                            error={!!errors.email}
+                            helperText={errors.email?.message}
                         />
 
                         <TextField
@@ -89,9 +92,17 @@ const SignUp = () => {
                             id='password'
                             fullWidth
                             type='password'
-                            helperText='Please enter a valid password'
                             margin='normal'
-                            onChange={handleChange}
+                            {...register('password', {
+                                required: 'Password is required',
+                                pattern: {
+                                    value: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/,
+                                    message:
+                                        'Password must contain at least 8 characters, one lowercase letter, one uppercase letter, and one number',
+                                },
+                            })}
+                            error={!!errors.password}
+                            helperText={errors.password?.message}
                         />
 
                         <Button
