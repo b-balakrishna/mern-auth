@@ -136,7 +136,10 @@ const Profile = () => {
                                 }
                             >
                                 <Avatar
-                                    src={currentUser?.profilePicture}
+                                    src={
+                                        updatedData?.profilePicture ||
+                                        currentUser?.profilePicture
+                                    }
                                     sx={{ width: 70, height: 70 }}
                                 />
                             </IconButton>
