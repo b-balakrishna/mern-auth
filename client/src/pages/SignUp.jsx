@@ -25,7 +25,6 @@ const SignUp = () => {
 
     const onSubmit = async (formData) => {
         try {
-            debugger;
             setLoading(true);
             e.preventDefault();
             const response = await axios.post(

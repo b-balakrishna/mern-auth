@@ -1,11 +1,25 @@
-import { Typography, TextField, Button, Grid, Avatar } from '@mui/material';
+import {
+    Typography,
+    TextField,
+    Button,
+    Grid,
+    Avatar,
+    IconButton,
+} from '@mui/material';
 import toast from 'react-hot-toast';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import StyledGrid from '../common/StyledGrid';
 import StyledPaper from '../common/StyledPaper';
 import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
+import { app } from '../firebase';
+import {
+    getStorage,
+    ref,
+    uploadBytesResumable,
+    getDownloadURL,
+} from 'firebase/storage';
 
 const Profile = () => {
     const { currentUser } = useSelector((state) => state.user);
@@ -21,6 +35,11 @@ const Profile = () => {
     const { register, handleSubmit, formState, reset } = form;
     const { errors } = formState;
     const [isEditable, setIsEditable] = useState(false);
+    const fileRef = useRef(null);
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [uploadPercent, setUploadPercent] = useState(0);
+    const [imageError, setImageError] = useState(false);
+    const [updatedData, setUpdatedData] = useState({});
 
     const handleEditClick = () => {
         if (isEditable) {
@@ -37,6 +56,48 @@ const Profile = () => {
         try {
         } catch (error) {}
     };
+
+    useEffect(() => {
+        if (selectedImage) {
+            handleFileUpload(selectedImage);
+        }
+    }, [selectedImage]);
+    console.log(updatedData, 'formData');
+
+    const handleFileUpload = async (image) => {
+        const storage = getStorage(app);
+        const fileName = new Date().getTime() + image.name;
+        const storageRef = ref(storage, fileName);
+        const uploadTask = uploadBytesResumable(storageRef, image);
+        uploadTask.on(
+            'state_changed',
+            (snapshot) => {
+                const progress =
+                    (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                setUploadPercent(Math.round(progress));
+            },
+            (error) => {
+                setImageError(true);
+            },
+            () => {
+                getDownloadURL(uploadTask.snapshot.ref).then((downloadUrl) => {
+                    setUpdatedData({
+                        ...updatedData,
+                        profilePicture: downloadUrl,
+                    });
+                    toast.success('Image uploaded Successfully');
+                });
+            }
+        );
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setSelectedImage(file);
+        }
+    };
+
     return (
         <StyledGrid
             container
@@ -59,11 +120,38 @@ const Profile = () => {
                                 margin: '5px 0px',
                             }}
                         >
-                            <Avatar
-                                src={currentUser?.profilePicture}
-                                sx={{ width: 70, height: 70 }}
+                            <input
+                                type='file'
+                                ref={fileRef}
+                                accept='image/*'
+                                hidden
+                                onChange={handleImageChange}
                             />
+                            <IconButton
+                                style={{
+                                    cursor: isEditable ? 'pointer' : 'default',
+                                }}
+                                onClick={() =>
+                                    isEditable && fileRef.current.click()
+                                }
+                            >
+                                <Avatar
+                                    src={currentUser?.profilePicture}
+                                    sx={{ width: 70, height: 70 }}
+                                />
+                            </IconButton>
                         </div>
+                        {imageError ? (
+                            <Typography color='red' align='center'>
+                                Error Uploading Image (File size should be less
+                                than 2MB)
+                            </Typography>
+                        ) : uploadPercent === 0 ||
+                          uploadPercent === 100 ? null : (
+                            <Typography color='green' align='center'>
+                                Uploading Image {uploadPercent}%
+                            </Typography>
+                        )}
                         <TextField
                             label='User Name'
                             id='username'
