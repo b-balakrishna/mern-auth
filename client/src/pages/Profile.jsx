@@ -5,6 +5,9 @@ import {
     Grid,
     Avatar,
     IconButton,
+    Dialog,
+    DialogTitle,
+    DialogActions,
 } from '@mui/material';
 import toast from 'react-hot-toast';
 import { useEffect, useRef, useState } from 'react';
@@ -24,10 +27,13 @@ import {
     updateUserFailure,
     updateUserStart,
     updateUserSuccess,
+    deleteUserStart,
+    deleteUserSuccess,
+    deleteUserFailure,
 } from '../redux/user/userSlice';
 
 const Profile = () => {
-    const { currentUser } = useSelector((state) => state.user);
+    const { currentUser, loading } = useSelector((state) => state.user);
 
     const form = useForm({
         defaultValues: {
@@ -45,6 +51,7 @@ const Profile = () => {
     const [uploadPercent, setUploadPercent] = useState(0);
     const [imageError, setImageError] = useState(false);
     const [updatedData, setUpdatedData] = useState({});
+    const [openDialog, setOpenDialog] = useState(false);
     const dispatch = useDispatch();
 
     const handleEditClick = (e) => {
@@ -121,10 +128,24 @@ const Profile = () => {
         }
     };
 
-    const handleDeleteClick = (e) => {
+    const handleDialogClose = () => setOpenDialog(false);
+
+    const handleDelete = async () => {
         try {
+            dispatch(deleteUserStart());
+            const response = await axios.delete(
+                `http://localhost:5000/api/user/delete/${currentUser._id}`,
+                { withCredentials: true }
+            );
+            if (response.status === 204) {
+                dispatch(deleteUserSuccess(response.data?.data));
+                return toast.success(response?.data?.message);
+            }
+            dispatch(deleteUserFailure());
+            return toast.error('Error deleting user');
         } catch (error) {
-            toast.error('Error deleting user');
+            dispatch(deleteUserFailure());
+            return toast.error('Error deleting user');
         }
     };
 
@@ -258,7 +279,7 @@ const Profile = () => {
                                     fullWidth
                                     type='button'
                                     style={{ marginTop: '16px' }}
-                                    onClick={handleDeleteClick}
+                                    onClick={() => setOpenDialog(true)}
                                 >
                                     Delete
                                 </Button>
@@ -271,6 +292,7 @@ const Profile = () => {
                                     fullWidth
                                     type='submit'
                                     style={{ marginTop: '16px' }}
+                                    disabled={loading}
                                 >
                                     Update
                                 </Button>
@@ -290,6 +312,18 @@ const Profile = () => {
                     </form>
                 </StyledPaper>
             </Grid>
+            <Dialog open={openDialog} onClose={handleDialogClose}>
+                <DialogTitle>
+                    Are you sure you want to permanently delete your account?
+                </DialogTitle>
+
+                <DialogActions>
+                    <Button onClick={handleDialogClose}>No</Button>
+                    <Button onClick={handleDelete} autoFocus>
+                        Yes
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </StyledGrid>
     );
 };
