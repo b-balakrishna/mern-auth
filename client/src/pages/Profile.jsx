@@ -30,6 +30,7 @@ import {
     deleteUserStart,
     deleteUserSuccess,
     deleteUserFailure,
+    signOut,
 } from '../redux/user/userSlice';
 
 const Profile = () => {
@@ -51,7 +52,8 @@ const Profile = () => {
     const [uploadPercent, setUploadPercent] = useState(0);
     const [imageError, setImageError] = useState(false);
     const [updatedData, setUpdatedData] = useState({});
-    const [openDialog, setOpenDialog] = useState(false);
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [openSignoutDialog, setOpenSignoutDialog] = useState(false);
     const dispatch = useDispatch();
 
     const handleEditClick = (e) => {
@@ -128,7 +130,10 @@ const Profile = () => {
         }
     };
 
-    const handleDialogClose = () => setOpenDialog(false);
+    const handleDialogClose = () => {
+        setOpenDeleteDialog(false);
+        setOpenSignoutDialog(false);
+    };
 
     const handleDelete = async () => {
         try {
@@ -149,6 +154,15 @@ const Profile = () => {
         }
     };
 
+    const handleSignOut = async () => {
+        try {
+            await axios.get('http://localhost:5000/api/auth/signout');
+            dispatch(signOut());
+            toast.success('Sign out successfully');
+        } catch (error) {
+            toast.error('Error Signing out');
+        }
+    };
     return (
         <StyledGrid
             container
@@ -279,9 +293,19 @@ const Profile = () => {
                                     fullWidth
                                     type='button'
                                     style={{ marginTop: '16px' }}
-                                    onClick={() => setOpenDialog(true)}
+                                    onClick={() => setOpenDeleteDialog(true)}
                                 >
                                     Delete
+                                </Button>
+                                <Button
+                                    variant='contained'
+                                    color='primary'
+                                    fullWidth
+                                    type='button'
+                                    style={{ marginTop: '16px' }}
+                                    onClick={() => setOpenSignoutDialog(true)}
+                                >
+                                    Sign Out
                                 </Button>
                             </>
                         ) : (
@@ -312,20 +336,42 @@ const Profile = () => {
                     </form>
                 </StyledPaper>
             </Grid>
-            <Dialog open={openDialog} onClose={handleDialogClose}>
-                <DialogTitle>
-                    Are you sure you want to permanently delete your account?
-                </DialogTitle>
-
-                <DialogActions>
-                    <Button onClick={handleDialogClose}>No</Button>
-                    <Button onClick={handleDelete} autoFocus>
-                        Yes
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <PopupDialog
+                openDialog={openDeleteDialog}
+                handleDialogClose={handleDialogClose}
+                handleFunction={handleDelete}
+                context={
+                    'Are you sure you want to permanently delete your account?'
+                }
+            />
+            <PopupDialog
+                openDialog={openSignoutDialog}
+                handleDialogClose={handleDialogClose}
+                handleFunction={handleSignOut}
+                context={'Are you sure you want to SignOut?'}
+            />
         </StyledGrid>
     );
 };
 
 export default Profile;
+
+export const PopupDialog = ({
+    openDialog,
+    handleDialogClose,
+    handleFunction,
+    context,
+}) => {
+    return (
+        <Dialog open={openDialog} onClose={handleDialogClose}>
+            <DialogTitle>{context}</DialogTitle>
+
+            <DialogActions>
+                <Button onClick={handleDialogClose}>No</Button>
+                <Button onClick={handleFunction} autoFocus>
+                    Yes
+                </Button>
+            </DialogActions>
+        </Dialog>
+    );
+};
