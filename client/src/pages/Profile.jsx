@@ -12,7 +12,7 @@ import axios from 'axios';
 import StyledGrid from '../common/StyledGrid';
 import StyledPaper from '../common/StyledPaper';
 import { useForm } from 'react-hook-form';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { app } from '../firebase';
 import {
     getStorage,
@@ -20,6 +20,11 @@ import {
     uploadBytesResumable,
     getDownloadURL,
 } from 'firebase/storage';
+import {
+    updateUserFailure,
+    updateUserStart,
+    updateUserSuccess,
+} from '../redux/user/userSlice';
 
 const Profile = () => {
     const { currentUser } = useSelector((state) => state.user);
@@ -28,7 +33,7 @@ const Profile = () => {
         defaultValues: {
             username: currentUser?.username,
             email: currentUser?.email,
-            password: '',
+            password: currentUser?.password || '',
         },
         mode: 'onTouched',
     });
@@ -40,8 +45,10 @@ const Profile = () => {
     const [uploadPercent, setUploadPercent] = useState(0);
     const [imageError, setImageError] = useState(false);
     const [updatedData, setUpdatedData] = useState({});
+    const dispatch = useDispatch();
 
-    const handleEditClick = () => {
+    const handleEditClick = (e) => {
+        e.preventDefault();
         if (isEditable) {
             reset({
                 username: currentUser?.username,
@@ -52,17 +59,11 @@ const Profile = () => {
         setIsEditable((prev) => !prev);
     };
 
-    const onSubmit = async (formData) => {
-        try {
-        } catch (error) {}
-    };
-
     useEffect(() => {
         if (selectedImage) {
             handleFileUpload(selectedImage);
         }
     }, [selectedImage]);
-    console.log(updatedData, 'formData');
 
     const handleFileUpload = async (image) => {
         const storage = getStorage(app);
@@ -98,6 +99,35 @@ const Profile = () => {
         }
     };
 
+    const handleUpdateUser = async (formData, e) => {
+        try {
+            formData.profilePicture = updatedData?.profilePicture;
+            dispatch(updateUserStart());
+            e.preventDefault();
+            const response = await axios.post(
+                `http://localhost:5000/api/user/update/${currentUser._id}`,
+                formData,
+                { withCredentials: true }
+            );
+            if (response.status === 200) {
+                dispatch(updateUserSuccess(response.data?.data));
+                return toast.success(response?.data?.message);
+            }
+            dispatch(updateUserFailure(response));
+            return toast.error('Error updating user');
+        } catch (error) {
+            dispatch(updateUserFailure(error));
+            return toast.error('Error updating user');
+        }
+    };
+
+    const handleDeleteClick = (e) => {
+        try {
+        } catch (error) {
+            toast.error('Error deleting user');
+        }
+    };
+
     return (
         <StyledGrid
             container
@@ -108,7 +138,7 @@ const Profile = () => {
         >
             <Grid item xs={12} sm={8} md={6} lg={4}>
                 <StyledPaper elevation={3}>
-                    <form onSubmit={handleSubmit(onSubmit)} noValidate>
+                    <form onSubmit={handleSubmit(handleUpdateUser)} noValidate>
                         <Typography variant='h5' gutterBottom align='center'>
                             Profile
                         </Typography>
@@ -228,6 +258,7 @@ const Profile = () => {
                                     fullWidth
                                     type='button'
                                     style={{ marginTop: '16px' }}
+                                    onClick={handleDeleteClick}
                                 >
                                     Delete
                                 </Button>
@@ -238,7 +269,7 @@ const Profile = () => {
                                     variant='contained'
                                     color='warning'
                                     fullWidth
-                                    type='button'
+                                    type='submit'
                                     style={{ marginTop: '16px' }}
                                 >
                                     Update
