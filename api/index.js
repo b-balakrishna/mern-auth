@@ -6,7 +6,7 @@ import cors from 'cors';
 import userRoutes from './routes/user.route.js';
 import authRoutes from './routes/auth.route.js';
 import cookieParser from 'cookie-parser';
-import { __dirname } from 'path';
+import path from 'path';
 
 const app = express();
 
@@ -17,10 +17,10 @@ const corsOptions = {
     optionsSuccessStatus: 204,
 };
 
-app.use(express.static(path.join(__dirname, '../client/dist')));
+app.use(express.static(path.join(path.dirname, '../client/dist')));
 
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client', 'dist', 'index.html'));
+    res.sendFile(path.join(path.dirname, '../client', 'dist', 'index.html'));
 });
 app.use(cors(corsOptions));
 app.use(express.json());
