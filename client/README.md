@@ -44,8 +44,8 @@ Add your symbolic representation here if needed.
 
 ## Project Structure
 
--   `api/`: Contains the backend source code
--   `client/`: Contains the frontend source code
+-   `src/`: Contains the main source code
+-   `public/`: Public assets and HTML template
 
 ## Usage
 
