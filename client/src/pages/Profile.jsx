@@ -69,6 +69,30 @@ const Profile = () => {
         setIsEditable((prev) => !prev);
     };
 
+    const handleCancel = async (e) => {
+        if (isEditable) {
+            reset({
+                username: currentUser?.username,
+                email: currentUser?.email,
+                password: '',
+            });
+            const storage = getStorage(app);
+            if (updatedData?.profilePicture) {
+                const pathArray = updatedData?.profilePicture.split('/');
+                let fileName = pathArray[pathArray.length - 1];
+                if (fileName.includes('?')) {
+                    fileName = fileName.split('?')[0];
+                }
+                await deleteObject(ref(storage, fileName));
+            }
+            setUpdatedData({
+                ...updatedData,
+                profilePicture: null,
+            });
+        }
+        setIsEditable((prev) => !prev);
+    };
+
     useEffect(() => {
         if (selectedImage) {
             handleFileUpload(selectedImage);
@@ -77,6 +101,7 @@ const Profile = () => {
     }, [selectedImage]);
 
     const handleFileUpload = async (image) => {
+        setImageError(false);
         const storage = getStorage(app);
         const fileName = new Date().getTime() + image.name;
         const storageRef = ref(storage, fileName);
@@ -90,6 +115,7 @@ const Profile = () => {
             },
             (error) => {
                 setImageError(true);
+                setSelectedImage(null);
             },
             () => {
                 getDownloadURL(uploadTask.snapshot.ref).then((downloadUrl) => {
@@ -97,6 +123,7 @@ const Profile = () => {
                         ...updatedData,
                         profilePicture: downloadUrl,
                     });
+                    setSelectedImage(null);
                     toast.success('Image uploaded Successfully');
                 });
             }
@@ -122,6 +149,7 @@ const Profile = () => {
             );
             if (response.status === 200) {
                 dispatch(updateUserSuccess(response.data?.data));
+                setUpdatedData({});
                 setIsEditable(false);
                 return toast.success(response?.data?.message);
             }
@@ -147,9 +175,15 @@ const Profile = () => {
             );
             if (response.status === 204) {
                 const storage = getStorage(app);
-                if (currentUser?.profilePicture) {
+                if (
+                    currentUser?.profilePicture &&
+                    currentUser.profilePicture.includes('firebase')
+                ) {
                     const pathArray = currentUser?.profilePicture.split('/');
-                    const fileName = pathArray[pathArray.length - 1];
+                    let fileName = pathArray[pathArray.length - 1];
+                    if (fileName.includes('?')) {
+                        fileName = fileName.split('?')[0];
+                    }
                     await deleteObject(ref(storage, fileName));
                 }
                 dispatch(deleteUserSuccess(response.data?.data));
@@ -336,7 +370,7 @@ const Profile = () => {
                                     fullWidth
                                     type='button'
                                     style={{ marginTop: '16px' }}
-                                    onClick={handleEditClick}
+                                    onClick={handleCancel}
                                 >
                                     Cancel
                                 </Button>
