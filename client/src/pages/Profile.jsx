@@ -124,6 +124,7 @@ const Profile = () => {
             }
             dispatch(updateUserFailure(response));
             return toast.error('Error updating user');
+            setIsEditable(false);
         } catch (error) {
             dispatch(updateUserFailure(error));
             return toast.error('Error updating user');
