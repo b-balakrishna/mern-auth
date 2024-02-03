@@ -147,10 +147,11 @@ const Profile = () => {
             );
             if (response.status === 204) {
                 const storage = getStorage(app);
-                const pathArray = currentUser?.profilePicture.split('/');
-                const fileName = pathArray[pathArray.length - 1];
-
-                await deleteObject(ref(storage, fileName));
+                if (currentUser?.profilePicture) {
+                    const pathArray = currentUser?.profilePicture.split('/');
+                    const fileName = pathArray[pathArray.length - 1];
+                    await deleteObject(ref(storage, fileName));
+                }
                 dispatch(deleteUserSuccess(response.data?.data));
                 return toast.success(response?.data?.message);
             }
