@@ -14,9 +14,9 @@ const OAuth = () => {
     const handleGoogleClick = async () => {
         try {
             const provider = new GoogleAuthProvider();
-            console.log(import.meta.env.VITE_FIREBASE_API_KEY, 'key');
             console.log('Aquired google provider');
             const auth = getAuth(app);
+            console.log(auth, 'auth');
             const result = await signInWithPopup(auth, provider);
             console.log('Aquired google Result');
             const user = {
