@@ -72,6 +72,7 @@ const Profile = () => {
         if (selectedImage) {
             handleFileUpload(selectedImage);
         }
+        ``;
     }, [selectedImage]);
 
     const handleFileUpload = async (image) => {
@@ -120,10 +121,10 @@ const Profile = () => {
             );
             if (response.status === 200) {
                 dispatch(updateUserSuccess(response.data?.data));
+                setIsEditable(false);
                 return toast.success(response?.data?.message);
             }
             dispatch(updateUserFailure(response));
-            setIsEditable(false);
             return toast.error('Error updating user');
         } catch (error) {
             dispatch(updateUserFailure(error));
