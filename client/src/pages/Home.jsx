@@ -8,7 +8,11 @@ const Home = () => {
             justifyContent='center'
             alignItems='center'
             spacing={2}
-            style={{ minHeight: '70vh', backgroundColor: '#ffffff' }}
+            style={{
+                minHeight: '70vh',
+                backgroundColor: '#ffffff',
+                marginTop: 10,
+            }}
         >
             <Grid item>
                 <Typography

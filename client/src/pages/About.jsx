@@ -3,7 +3,7 @@ import { Typography, Paper, Container } from '@mui/material';
 
 const About = () => {
     return (
-        <Container maxWidth='md' style={{ paddingTop: '2rem' }}>
+        <Container maxWidth='lg' style={{ paddingTop: '2rem' }}>
             <Paper elevation={3} style={{ padding: '1.5rem' }}>
                 <Typography variant='h6' paragraph>
                     Welcome to the About page!

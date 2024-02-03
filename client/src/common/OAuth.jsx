@@ -14,11 +14,8 @@ const OAuth = () => {
     const handleGoogleClick = async () => {
         try {
             const provider = new GoogleAuthProvider();
-            console.log('Aquired google provider');
             const auth = getAuth(app);
-            console.log(auth, 'auth');
             const result = await signInWithPopup(auth, provider);
-            console.log('Aquired google Result');
             const user = {
                 name: result.user.displayName,
                 email: result.user.email,
