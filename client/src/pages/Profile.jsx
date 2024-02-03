@@ -22,6 +22,7 @@ import {
     ref,
     uploadBytesResumable,
     getDownloadURL,
+    deleteObject,
 } from 'firebase/storage';
 import {
     updateUserFailure,
@@ -145,6 +146,11 @@ const Profile = () => {
                 { withCredentials: true }
             );
             if (response.status === 204) {
+                const storage = getStorage(app);
+                const pathArray = currentUser?.profilePicture.split('/');
+                const fileName = pathArray[pathArray.length - 1];
+
+                await deleteObject(ref(storage, fileName));
                 dispatch(deleteUserSuccess(response.data?.data));
                 return toast.success(response?.data?.message);
             }
