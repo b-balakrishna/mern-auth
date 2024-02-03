@@ -7,6 +7,10 @@ import userRoutes from './routes/user.route.js';
 import authRoutes from './routes/auth.route.js';
 import cookieParser from 'cookie-parser';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -17,10 +21,10 @@ const corsOptions = {
     optionsSuccessStatus: 204,
 };
 
-app.use(express.static(path.join(path.dirname, '../client/dist')));
+app.use(express.static(path.join(__dirname, './client/dist')));
 
 app.get('*', (req, res) => {
-    res.sendFile(path.join(path.dirname, '../client', 'dist', 'index.html'));
+    res.sendFile(path.join(__dirname, './client', 'dist', 'index.html'));
 });
 app.use(cors(corsOptions));
 app.use(express.json());
