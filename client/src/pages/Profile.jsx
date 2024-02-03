@@ -123,8 +123,8 @@ const Profile = () => {
                 return toast.success(response?.data?.message);
             }
             dispatch(updateUserFailure(response));
-            return toast.error('Error updating user');
             setIsEditable(false);
+            return toast.error('Error updating user');
         } catch (error) {
             dispatch(updateUserFailure(error));
             return toast.error('Error updating user');
