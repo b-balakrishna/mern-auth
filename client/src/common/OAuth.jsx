@@ -14,21 +14,19 @@ const OAuth = () => {
     const handleGoogleClick = async () => {
         try {
             const provider = new GoogleAuthProvider();
+            console.log('Aquired google provider');
             const auth = getAuth(app);
             const result = await signInWithPopup(auth, provider);
+            console.log('Aquired google Result');
             const user = {
                 name: result.user.displayName,
                 email: result.user.email,
                 photoUrl: result.user.photoURL,
                 provider: 'GOOGLE',
             };
-            const response = await axios.post(
-                'http://localhost:5000/api/auth/google',
-                user,
-                {
-                    withCredentials: true,
-                }
-            );
+            const response = await axios.post('/api/auth/google', user, {
+                withCredentials: true,
+            });
             dispatch(signInSuccess(response?.data?.data));
             toast.success(response.data.message);
             navigate('/');
