@@ -27,10 +27,7 @@ const SignUp = () => {
         try {
             setLoading(true);
             e.preventDefault();
-            const response = await axios.post(
-                'http://localhost:5000/api/auth/signup',
-                formData
-            );
+            const response = await axios.post('/api/auth/signup', formData);
             console.log(response);
             toast.success(response?.data?.message);
             setLoading(false);

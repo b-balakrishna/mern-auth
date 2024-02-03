@@ -114,7 +114,7 @@ const Profile = () => {
             dispatch(updateUserStart());
             e.preventDefault();
             const response = await axios.post(
-                `http://localhost:5000/api/user/update/${currentUser._id}`,
+                `/api/user/update/${currentUser._id}`,
                 formData,
                 { withCredentials: true }
             );
@@ -139,7 +139,7 @@ const Profile = () => {
         try {
             dispatch(deleteUserStart());
             const response = await axios.delete(
-                `http://localhost:5000/api/user/delete/${currentUser._id}`,
+                `/api/user/delete/${currentUser._id}`,
                 { withCredentials: true }
             );
             if (response.status === 204) {
@@ -156,7 +156,7 @@ const Profile = () => {
 
     const handleSignOut = async () => {
         try {
-            await axios.get('http://localhost:5000/api/auth/signout');
+            await axios.get('/api/auth/signout');
             dispatch(signOut());
             toast.success('Sign out successfully');
         } catch (error) {

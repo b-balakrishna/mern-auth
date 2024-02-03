@@ -36,11 +36,9 @@ const Login = () => {
             dispatch(signInStart());
             e.preventDefault();
             console.log(formData);
-            const response = await axios.post(
-                'http://localhost:5000/api/auth/signin',
-                formData,
-                { withCredentials: true }
-            );
+            const response = await axios.post('/api/auth/signin', formData, {
+                withCredentials: true,
+            });
             toast.success(response?.data?.message);
             dispatch(signInSuccess(response?.data?.data));
             navigate('/');
