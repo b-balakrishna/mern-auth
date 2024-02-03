@@ -40,6 +40,14 @@ const About = () => {
                     authentication.
                 </Typography>
                 <Typography paragraph>
+                    Additionally, this project incorporates Single Sign-On (SSO)
+                    for a seamless and secure user authentication experience.
+                    SSO allows users to log in once and access multiple
+                    interconnected systems without the need to re-enter
+                    credentials. This enhances convenience and security
+                    throughout the application.
+                </Typography>
+                <Typography paragraph>
                     Lastly, <span style={{ color: '#2196F3' }}>Redux</span> is
                     employed for state management, ensuring a centralized and
                     predictable state for the application. This helps in
